@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supply Chain Intelligence Platform | Anke Jimrison</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#060d1a;--card:#0c1628;--card2:#111e35;--border:#1c2e4a;
+  --blue:#3b82f6;--cyan:#06b6d4;--green:#10b981;--amber:#f59e0b;--red:#ef4444;--purple:#8b5cf6;
+  --text:#e2e8f0;--muted:#64748b;--sub:#94a3b8
+}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh}
+
+/* HEADER */
+.header{
+  background:linear-gradient(135deg,#0c1628,#0a1f3c);
+  border-bottom:1px solid var(--border);
+  padding:20px 28px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px
+}
+.header h1{font-size:1.3em;font-weight:700;letter-spacing:-.02em}
+.header h1 span{background:linear-gradient(135deg,#93c5fd,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header p{font-size:.75em;color:var(--muted);margin-top:3px;font-family:'JetBrains Mono',monospace}
+.badges{display:flex;gap:6px;flex-wrap:wrap}
+.badge{padding:4px 10px;border-radius:20px;font-size:.7em;font-weight:600;font-family:'JetBrains Mono',monospace;border:1px solid}
+.b-blue{background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.3);color:#93c5fd}
+.b-green{background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.3);color:#34d399}
+.b-amber{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:#fbbf24}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;margin-right:6px;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* MAIN */
+.main{padding:22px 28px}
+
+/* KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px;margin-bottom:20px}
+.kpi{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:16px 14px;position:relative;overflow:hidden;
+  animation:up .5s ease both
+}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.kpi.kc::after{background:linear-gradient(90deg,var(--cyan),var(--blue))}
+.kpi.kg::after{background:linear-gradient(90deg,var(--green),#34d399)}
+.kpi.ka::after{background:linear-gradient(90deg,var(--amber),#fb923c)}
+.kpi.kr::after{background:linear-gradient(90deg,var(--red),#f87171)}
+.kpi.kp::after{background:linear-gradient(90deg,var(--purple),#a78bfa)}
+.kpi-ico{position:absolute;top:14px;right:14px;font-size:1.3em;opacity:.25}
+.kpi-lbl{font-size:.68em;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:7px;font-family:'JetBrains Mono',monospace}
+.kpi-val{font-size:1.8em;font-weight:700;line-height:1;margin-bottom:5px}
+.kpi.kc .kpi-val{color:#67e8f9}
+.kpi.kg .kpi-val{color:#34d399}
+.kpi.ka .kpi-val{color:#fbbf24}
+.kpi.kr .kpi-val{color:#f87171}
+.kpi.kp .kpi-val{color:#c084fc}
+.kpi-sub{font-size:.7em;color:var(--muted);font-family:'JetBrains Mono',monospace}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.g3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px;margin-bottom:14px}
+.g1{margin-bottom:14px}
+
+/* PANEL */
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;animation:up .5s ease both}
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.pt{font-size:.78em;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.07em}
+.ptag{font-size:.66em;padding:2px 8px;border-radius:20px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);color:#93c5fd;font-family:'JetBrains Mono',monospace}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:.79em}
+.tbl th{text-align:left;padding:7px 9px;font-size:.72em;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);border-bottom:1px solid var(--border);font-weight:500}
+.tbl td{padding:8px 9px;border-bottom:1px solid rgba(28,46,74,.5);color:var(--sub);font-family:'JetBrains Mono',monospace;font-size:.9em}
+.tbl tr:hover td{background:rgba(59,130,246,.04)}
+.tb{padding:2px 7px;border-radius:4px;font-size:.82em;font-weight:600}
+.tc{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.2)}
+.th{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.2)}
+.tm{background:rgba(59,130,246,.15);color:#93c5fd;border:1px solid rgba(59,130,246,.2)}
+.tl{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.2)}
+.sbar{display:flex;align-items:center;gap:7px}
+.sbg{flex:1;height:4px;background:rgba(255,255,255,.05);border-radius:2px}
+.sbf{height:4px;border-radius:2px}
+
+/* FOOTER */
+footer{text-align:center;padding:18px;border-top:1px solid var(--border);font-size:.72em;color:var(--muted);font-family:'JetBrains Mono',monospace}
+footer a{color:var(--blue);text-decoration:none}
+
+@media(max-width:700px){
+  .g2,.g3{grid-template-columns:1fr}
+  .main{padding:14px}
+  .header{padding:14px}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>⚙ <span>Supply Chain Intelligence Platform</span></h1>
+    <p><span class="dot"></span>GlobalManufacture Pvt. Ltd. · ₹629Cr Procurement · FY 2023-24 · Interactive Analytics</p>
+  </div>
+  <div class="badges">
+    <span class="badge b-blue">Python</span>
+    <span class="badge b-blue">MySQL</span>
+    <span class="badge b-amber">Power BI</span>
+    <span class="badge b-green">Excel</span>
+    <a href="https://github.com/anke-jimrison" style="text-decoration:none"><span class="badge b-blue">👤 Anke Jimrison</span></a>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- KPIs -->
+<div class="kpi-row">
+  <div class="kpi kc"><div class="kpi-ico">💰</div><div class="kpi-lbl">Total Procurement Spend</div><div class="kpi-val">₹629Cr</div><div class="kpi-sub">5,000 POs · FY2023-24</div></div>
+  <div class="kpi kr"><div class="kpi-ico">📦</div><div class="kpi-lbl">On-Time Delivery Rate</div><div class="kpi-val">77.5%</div><div class="kpi-sub">Benchmark 95% · Gap: 17.5pp</div></div>
+  <div class="kpi ka"><div class="kpi-ico">💸</div><div class="kpi-lbl">Savings Opportunity</div><div class="kpi-val">₹27.7Cr</div><div class="kpi-sub">vs Median Benchmark Price</div></div>
+  <div class="kpi kr"><div class="kpi-ico">🚨</div><div class="kpi-lbl">Anomalous POs Detected</div><div class="kpi-val">94</div><div class="kpi-sub">₹43.3Cr at Risk · Z>2.5</div></div>
+  <div class="kpi kp"><div class="kpi-ico">⚠️</div><div class="kpi-lbl">Critical Risk Suppliers</div><div class="kpi-val">24</div><div class="kpi-sub">Out of 85 total suppliers</div></div>
+  <div class="kpi kg"><div class="kpi-ico">🔄</div><div class="kpi-lbl">Avg Quality Rejection</div><div class="kpi-val">2.31%</div><div class="kpi-sub">Target &lt;1.5% · Above target</div></div>
+</div>
+
+<!-- Row 1: Bar + Line -->
+<div class="g2">
+  <div class="panel">
+    <div class="ph"><span class="pt">🏭 Top Suppliers by Spend — Risk Tier Colored</span><span class="ptag">Supplier Intel</span></div>
+    <canvas id="cSupplier" height="230"></canvas>
+  </div>
+  <div class="panel">
+    <div class="ph"><span class="pt">📈 Monthly OTD % vs PO Volume</span><span class="ptag">Time Series</span></div>
+    <canvas id="cOTD" height="230"></canvas>
+  </div>
+</div>
+
+<!-- Row 2: Scatter + 2 Donuts -->
+<div class="g3">
+  <div class="panel">
+    <div class="ph"><span class="pt">⚬ OTD% vs Quality Rejection — Bubble = Spend</span><span class="ptag">Scatter Analysis</span></div>
+    <canvas id="cScatter" height="240"></canvas>
+  </div>
+  <div class="panel">
+    <div class="ph"><span class="pt">🍩 Spend by Category</span><span class="ptag">Mix</span></div>
+    <canvas id="cCat" height="240"></canvas>
+  </div>
+  <div class="panel">
+    <div class="ph"><span class="pt">🎯 Risk Tier</span><span class="ptag">85 Suppliers</span></div>
+    <canvas id="cRisk" height="240"></canvas>
+  </div>
+</div>
+
+<!-- Row 3: Scorecard Table -->
+<div class="panel g1">
+  <div class="ph"><span class="pt">📋 Supplier Risk Scorecard — Composite Score 0–100</span><span class="ptag">5-Factor Model</span></div>
+  <div style="overflow-x:auto">
+  <table class="tbl">
+    <thead><tr><th>Supplier</th><th>Category</th><th>OTD %</th><th>Rejection %</th><th>Spend (₹L)</th><th>Risk Score</th><th>Tier</th></tr></thead>
+    <tbody id="scoreTbody"></tbody>
+  </table>
+  </div>
+</div>
+
+<!-- Row 4: Anomaly + Warehouse -->
+<div class="g2">
+  <div class="panel">
+    <div class="ph"><span class="pt">🚨 Anomaly Detection — Z-Score + IQR Method</span><span class="ptag">Statistical Flag</span></div>
+    <canvas id="cAnomaly" height="220"></canvas>
+  </div>
+  <div class="panel">
+    <div class="ph"><span class="pt">🏪 Warehouse Health Scores — 6 Regions</span><span class="ptag">Inventory Health</span></div>
+    <canvas id="cWarehouse" height="220"></canvas>
+  </div>
+</div>
+
+<!-- Row 5: Demand Supply -->
+<div class="panel g1">
+  <div class="ph"><span class="pt">📊 Monthly Demand vs Supply — All Warehouses</span><span class="ptag">Gap Analysis</span></div>
+  <canvas id="cGap" height="160"></canvas>
+</div>
+
+</div>
+
+<footer>
+  Built by <a href="https://github.com/anke-jimrison">Anke Jimrison</a> &nbsp;|&nbsp; Supply Chain Intelligence Platform &nbsp;|&nbsp; Python · MySQL · Excel · Power BI
+</footer>
+
+<script>
+Chart.defaults.color='#64748b';
+Chart.defaults.borderColor='#1c2e4a';
+Chart.defaults.font.family="'JetBrains Mono',monospace";
+Chart.defaults.font.size=10;
+
+const mo=['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
+
+// ── Supplier Bar ──────────────────────────
+new Chart('cSupplier',{type:'bar',data:{
+  labels:['Apex Raw Ind.','Delta Pack Corp','Crown Chem Ltd','Horizon Log','Bharat Comp','Global Raw','Eagle Pack','Indus Chem','Jupiter Log','Kiran Comp','Lotus Raw','Frontier Pack'],
+  datasets:[{label:'Spend ₹L',data:[48.2,42.7,39.1,35.8,33.4,31.9,29.7,27.5,25.8,24.2,22.9,21.3],
+    backgroundColor:['rgba(16,185,129,.5)','rgba(59,130,246,.5)','rgba(245,158,11,.5)','rgba(245,158,11,.5)','rgba(239,68,68,.5)','rgba(59,130,246,.5)','rgba(239,68,68,.5)','rgba(245,158,11,.5)','rgba(16,185,129,.5)','rgba(239,68,68,.5)','rgba(59,130,246,.5)','rgba(245,158,11,.5)'],
+    borderColor:['#10b981','#3b82f6','#f59e0b','#f59e0b','#ef4444','#3b82f6','#ef4444','#f59e0b','#10b981','#ef4444','#3b82f6','#f59e0b'],
+    borderWidth:2,borderRadius:6}]
+},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},
+  scales:{x:{grid:{color:'#1c2e4a'}},y:{grid:{display:false}}}}});
+
+// ── OTD Trend ────────────────────────────
+new Chart('cOTD',{type:'bar',data:{
+  labels:mo,
+  datasets:[
+    {type:'line',label:'OTD Rate %',data:[79.2,76.8,75.4,78.9,80.1,77.3,76.5,74.8,78.2,79.6,77.9,76.4],
+      borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.1)',borderWidth:2.5,
+      pointBackgroundColor:'#3b82f6',pointRadius:4,tension:.4,yAxisID:'y1',fill:true},
+    {type:'bar',label:'PO Volume',data:[390,410,425,445,380,420,435,460,390,440,415,405],
+      backgroundColor:'rgba(16,185,129,.2)',borderColor:'rgba(16,185,129,.5)',borderWidth:1,borderRadius:4,yAxisID:'y'}
+  ]
+},options:{responsive:true,
+  plugins:{legend:{labels:{color:'#64748b',padding:12}}},
+  scales:{
+    y:{grid:{color:'#1c2e4a'},title:{display:true,text:'PO Volume',color:'#64748b'}},
+    y1:{position:'right',grid:{display:false},min:70,max:85,ticks:{callback:v=>v+'%'},title:{display:true,text:'OTD %',color:'#64748b'}}
+  }}});
+
+// ── Scatter ───────────────────────────────
+const sData=[
+  {x:92,y:.8,r:7,name:'Apex Raw',risk:'Low'},
+  {x:88,y:1.2,r:6.5,name:'Delta Pack',risk:'Medium'},
+  {x:71,y:4.2,r:6.8,name:'Crown Chem',risk:'Critical'},
+  {x:65,y:5.8,r:6.2,name:'Bharat Comp',risk:'Critical'},
+  {x:79,y:2.1,r:6.3,name:'Horizon Log',risk:'High'},
+  {x:84,y:1.5,r:6,name:'Global Raw',risk:'Medium'},
+  {x:58,y:6.9,r:5.8,name:'Eagle Pack',risk:'Critical'},
+  {x:76,y:3.2,r:5.6,name:'Indus Chem',risk:'High'},
+  {x:90,y:.6,r:5.4,name:'Jupiter Log',risk:'Low'},
+  {x:69,y:4.8,r:5.2,name:'Kiran Comp',risk:'Critical'},
+];
+const rc={'Critical':'#ef4444','High':'#f59e0b','Medium':'#3b82f6','Low':'#10b981'};
+new Chart('cScatter',{type:'bubble',data:{
+  datasets:['Critical','High','Medium','Low'].map(t=>({
+    label:t+' Risk',
+    data:sData.filter(d=>d.risk===t).map(d=>({x:d.x,y:d.y,r:d.r,name:d.name})),
+    backgroundColor:rc[t]+'55',borderColor:rc[t],borderWidth:2
+  }))
+},options:{responsive:true,
+  plugins:{legend:{labels:{color:'#64748b',padding:10}},
+    tooltip:{callbacks:{label:ctx=>`${ctx.raw.name}: OTD ${ctx.raw.x}% · Rej ${ctx.raw.y}%`}}},
+  scales:{
+    x:{min:50,max:100,grid:{color:'#1c2e4a'},title:{display:true,text:'OTD Rate %'}},
+    y:{min:0,max:8,grid:{color:'#1c2e4a'},title:{display:true,text:'Rejection %'}}
+  }}});
+
+// ── Category Donut ─────────────────────────
+new Chart('cCat',{type:'doughnut',data:{
+  labels:['Raw Material','Packaging','Components','Chemicals','Logistics'],
+  datasets:[{data:[32.1,24.6,19.8,14.2,9.3],
+    backgroundColor:['#3b82f6','#06b6d4','#10b981','#f59e0b','#8b5cf6'],
+    borderColor:'#0c1628',borderWidth:3}]
+},options:{responsive:true,cutout:'65%',
+  plugins:{legend:{position:'bottom',labels:{color:'#64748b',padding:8,font:{size:9}}}}}});
+
+// ── Risk Donut ─────────────────────────────
+new Chart('cRisk',{type:'doughnut',data:{
+  labels:['Critical (24)','High (16)','Medium (45)'],
+  datasets:[{data:[24,16,45],
+    backgroundColor:['#ef4444','#f59e0b','#3b82f6'],
+    borderColor:'#0c1628',borderWidth:3}]
+},options:{responsive:true,cutout:'65%',
+  plugins:{legend:{position:'bottom',labels:{color:'#64748b',padding:8,font:{size:9}}}}}});
+
+// ── Scorecard Table ────────────────────────
+const sd=[
+  {name:'Eagle Pack Industries',cat:'Packaging',otd:58.4,rej:6.9,spend:29.7,score:84.2,tier:'CRITICAL'},
+  {name:'Bharat Comp Enterprises',cat:'Components',otd:65.2,rej:5.8,spend:33.4,score:79.8,tier:'CRITICAL'},
+  {name:'Kiran Comp Ltd',cat:'Components',otd:69.1,rej:4.8,spend:22.9,score:76.4,tier:'CRITICAL'},
+  {name:'Crown Chem Ltd',cat:'Chemicals',otd:71.3,rej:4.2,spend:39.1,score:71.9,tier:'CRITICAL'},
+  {name:'Horizon Log Works',cat:'Logistics',otd:79.2,rej:2.1,spend:35.8,score:58.7,tier:'HIGH'},
+  {name:'Frontier Pack Corp',cat:'Packaging',otd:74.6,rej:3.6,spend:21.3,score:55.2,tier:'HIGH'},
+  {name:'Indus Chem Corp',cat:'Chemicals',otd:76.4,rej:3.2,spend:27.5,score:52.1,tier:'HIGH'},
+  {name:'Delta Pack Corp',cat:'Packaging',otd:88.4,rej:1.2,spend:42.7,score:38.4,tier:'MEDIUM'},
+  {name:'Global Raw Ltd',cat:'Raw Material',otd:84.1,rej:1.5,spend:31.9,score:35.9,tier:'MEDIUM'},
+  {name:'Jupiter Log Works',cat:'Logistics',otd:90.2,rej:.6,spend:25.8,score:18.4,tier:'LOW'},
+  {name:'Apex Raw Industries',cat:'Raw Material',otd:92.1,rej:.8,spend:48.2,score:14.2,tier:'LOW'},
+];
+const tbody=document.getElementById('scoreTbody');
+sd.forEach(r=>{
+  const tc=r.tier==='CRITICAL'?'tc':r.tier==='HIGH'?'th':r.tier==='MEDIUM'?'tm':'tl';
+  const bc=r.tier==='CRITICAL'?'#ef4444':r.tier==='HIGH'?'#f59e0b':r.tier==='MEDIUM'?'#3b82f6':'#10b981';
+  const oc=r.otd<75?'#f87171':r.otd<85?'#fbbf24':'#34d399';
+  const rc2=r.rej>4?'#f87171':r.rej>2?'#fbbf24':'#34d399';
+  tbody.innerHTML+=`<tr>
+    <td style="color:#e2e8f0;font-weight:600">${r.name}</td>
+    <td>${r.cat}</td>
+    <td style="color:${oc}">${r.otd}%</td>
+    <td style="color:${rc2}">${r.rej}%</td>
+    <td>₹${r.spend}L</td>
+    <td><div class="sbar"><div class="sbg"><div class="sbf" style="width:${r.score}%;background:${bc}"></div></div><span style="color:${bc};min-width:30px">${r.score}</span></div></td>
+    <td><span class="tb ${tc}">${r.tier}</span></td>
+  </tr>`;
+});
+
+// ── Anomaly Bar ────────────────────────────
+new Chart('cAnomaly',{type:'bar',data:{
+  labels:['Price Spike\nZ>3.5','Price Spike\nZ 2.5-3.5','Qty Outlier\nIQR','Duplicate\nPattern','Combined\nFlag'],
+  datasets:[{label:'Count',data:[18,31,22,14,9],
+    backgroundColor:['rgba(239,68,68,.7)','rgba(239,68,68,.4)','rgba(245,158,11,.6)','rgba(245,158,11,.4)','rgba(139,92,246,.5)'],
+    borderColor:['#ef4444','#ef4444','#f59e0b','#f59e0b','#8b5cf6'],
+    borderWidth:2,borderRadius:8}]
+},options:{responsive:true,plugins:{legend:{display:false}},
+  scales:{y:{grid:{color:'#1c2e4a'}},x:{grid:{display:false}}}}});
+
+// ── Warehouse ──────────────────────────────
+const wh=[78.4,71.2,68.9,74.6,62.1,69.8];
+new Chart('cWarehouse',{type:'bar',data:{
+  labels:['Mumbai','Delhi','Bangalore','Hyderabad','Kolkata','Chennai'],
+  datasets:[{label:'Health /100',data:wh,
+    backgroundColor:wh.map(s=>s>=75?'rgba(16,185,129,.5)':s>=65?'rgba(245,158,11,.5)':'rgba(239,68,68,.5)'),
+    borderColor:wh.map(s=>s>=75?'#10b981':s>=65?'#f59e0b':'#ef4444'),
+    borderWidth:2,borderRadius:8}]
+},options:{responsive:true,plugins:{legend:{display:false}},
+  scales:{y:{min:0,max:100,grid:{color:'#1c2e4a'}},x:{grid:{display:false}}}}});
+
+// ── Demand-Supply Gap ──────────────────────
+new Chart('cGap',{type:'bar',data:{
+  labels:mo,
+  datasets:[
+    {label:'Demand',data:[42000,45200,48100,51300,44800,47600,49200,52800,46100,49800,47200,50600],
+      backgroundColor:'rgba(59,130,246,.45)',borderColor:'#3b82f6',borderWidth:1,borderRadius:4},
+    {label:'Supply',data:[39800,43100,46800,52100,42300,48900,47600,51200,47800,50600,45900,52100],
+      backgroundColor:'rgba(16,185,129,.35)',borderColor:'#10b981',borderWidth:1,borderRadius:4}
+  ]
+},options:{responsive:true,plugins:{legend:{labels:{color:'#64748b',padding:14}}},
+  scales:{y:{grid:{color:'#1c2e4a'}},x:{grid:{display:false}}}}});
+</script>
+</body>
+</html>
