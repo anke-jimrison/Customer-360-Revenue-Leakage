@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer 360° Revenue Leakage | Anke Jimrison</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#0a0f1a;color:#e2e8f0}
+header{background:linear-gradient(135deg,#1a0533,#7c3aed);padding:28px 40px}
+header h1{font-size:1.7rem;color:#fff}
+header p{color:#c4b5fd;margin-top:5px;font-size:0.9rem}
+.badge{display:inline-block;background:rgba(255,255,255,0.15);color:#fff;padding:3px 10px;border-radius:20px;font-size:0.78rem;margin:6px 3px 0}
+.container{max-width:1100px;margin:28px auto;padding:0 18px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:26px}
+.kpi{background:#111827;border:1px solid #2d1b69;border-radius:12px;padding:18px;text-align:center}
+.kpi .val{font-size:1.6rem;font-weight:700;color:#a78bfa}
+.kpi .lbl{font-size:0.73rem;color:#94a3b8;margin-top:5px}
+.kpi.red .val{color:#f87171}.kpi.green .val{color:#34d399}
+.kpi.yellow .val{color:#fbbf24}.kpi.blue .val{color:#60a5fa}
+.sec{background:#111827;border:1px solid #1e293b;border-radius:12px;padding:22px;margin-bottom:22px}
+.sec h2{font-size:1rem;color:#a78bfa;margin-bottom:14px;border-bottom:1px solid #2d1b69;padding-bottom:9px}
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px}
+.chart-box{background:#111827;border:1px solid #1e293b;border-radius:12px;padding:20px}
+.chart-box h3{font-size:0.9rem;color:#a78bfa;margin-bottom:14px}
+.chart-wrap{position:relative;height:260px}
+@media(max-width:700px){.charts-row{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse;font-size:0.84rem}
+th{background:#0a0f1a;color:#94a3b8;padding:9px 11px;text-align:left;font-weight:600}
+td{padding:9px 11px;border-bottom:1px solid #1e293b}
+tr:hover td{background:#0a0f1a}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:680px){.two{grid-template-columns:1fr}}
+.pill{padding:2px 9px;border-radius:10px;font-size:0.73rem;font-weight:600}
+.pill-c{background:#422006;color:#fde68a}
+.pill-r{background:#7f1d1d;color:#fca5a5}
+.pill-l{background:#064e3b;color:#6ee7b7}
+.pill-n{background:#1e3a5f;color:#93c5fd}
+.pill-g{background:#1e1b4b;color:#c4b5fd}
+.pill-h{background:#7c2d12;color:#fed7aa}
+.hm{overflow-x:auto}
+.hm table{min-width:580px}
+.h-high{background:#064e3b;color:#6ee7b7;text-align:center}
+.h-med{background:#065f46;color:#a7f3d0;text-align:center}
+.h-low{background:#7f1d1d;color:#fca5a5;text-align:center}
+.h-zero{background:#1f2937;color:#6b7280;text-align:center}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:0.75rem;margin-top:10px}
+.leg-dot{width:12px;height:12px;border-radius:2px;display:inline-block;margin-right:4px}
+footer{text-align:center;padding:28px;color:#475569;font-size:0.82rem}
+footer a{color:#a78bfa;text-decoration:none;margin:0 6px}
+</style>
+</head>
+<body>
+<header>
+  <h1>👥 Customer 360° Revenue Leakage Platform</h1>
+  <p>StyleCart — ₹200Cr+ D2C Fashion Brand · 7,990 Customers · 36,984 Transactions · 24-Month Window</p>
+  <span class="badge">Python</span><span class="badge">MySQL</span><span class="badge">RFM Segmentation</span>
+  <span class="badge">CLV Modeling</span><span class="badge">Cohort Retention</span><span class="badge">Churn Prediction</span>
+</header>
+
+<div class="container">
+<!-- KPIs -->
+<div class="kpi-grid">
+  <div class="kpi yellow"><div class="val">1,433</div><div class="lbl">Champion Customers (18%)</div></div>
+  <div class="kpi green"><div class="val">54%</div><div class="lbl">GMV by Champions</div></div>
+  <div class="kpi red"><div class="val">₹2.86Cr</div><div class="lbl">Revenue at Risk</div></div>
+  <div class="kpi red"><div class="val">3,261</div><div class="lbl">Critical Churn (Score>70)</div></div>
+  <div class="kpi"><div class="val">663</div><div class="lbl">Discount Abusers</div></div>
+  <div class="kpi blue"><div class="val">105×</div><div class="lbl">CLV Gap Champions vs Lost</div></div>
+</div>
+
+<!-- CHARTS ROW 1 -->
+<div class="charts-row">
+  <div class="chart-box">
+    <h3>📊 RFM Segment Distribution — 7,990 Customers</h3>
+    <div class="chart-wrap"><canvas id="segChart"></canvas></div>
+  </div>
+  <div class="chart-box">
+    <h3>💰 GMV Contribution by Segment</h3>
+    <div class="chart-wrap"><canvas id="gmvChart"></canvas></div>
+  </div>
+</div>
+
+<!-- CHARTS ROW 2 -->
+<div class="charts-row">
+  <div class="chart-box">
+    <h3>📈 CLV Comparison by Segment (₹)</h3>
+    <div class="chart-wrap"><canvas id="clvChart"></canvas></div>
+  </div>
+  <div class="chart-box">
+    <h3>⚠️ Churn Score Distribution</h3>
+    <div class="chart-wrap"><canvas id="churnChart"></canvas></div>
+  </div>
+</div>
+
+<!-- RFM Table -->
+<div class="sec">
+  <h2>🎯 RFM Segmentation — 8 Actionable Segments (NTILE-5 Quintile Scoring)</h2>
+  <table>
+    <thead><tr><th>Segment</th><th>Customers</th><th>% Base</th><th>CLV (Avg)</th><th>GMV Share</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td style="color:#fbbf24;font-weight:700">Champions</td><td>1,433</td><td>18%</td><td>₹56,472</td><td style="color:#fbbf24;font-weight:700">54%</td><td><span class="pill pill-c">REWARD & RETAIN</span></td></tr>
+      <tr><td style="color:#34d399">Loyal Customers</td><td>1,118</td><td>14%</td><td>₹28,340</td><td style="color:#34d399">21%</td><td><span class="pill pill-l">UPSELL</span></td></tr>
+      <tr><td style="color:#60a5fa">Potential Loyalists</td><td>959</td><td>12%</td><td>₹14,200</td><td>9%</td><td><span class="pill pill-n">NURTURE</span></td></tr>
+      <tr><td style="color:#60a5fa">New Customers</td><td>719</td><td>9%</td><td>₹4,800</td><td>4%</td><td><span class="pill pill-n">ONBOARD</span></td></tr>
+      <tr><td style="color:#60a5fa">Promising</td><td>639</td><td>8%</td><td>₹6,100</td><td>3%</td><td><span class="pill pill-n">ENGAGE</span></td></tr>
+      <tr><td style="color:#fb923c">At Risk</td><td>1,118</td><td>14%</td><td>₹9,200</td><td>5%</td><td><span class="pill pill-h">WIN BACK</span></td></tr>
+      <tr><td style="color:#f87171;font-weight:700">Cannot Lose Them</td><td>799</td><td>10%</td><td>₹31,000</td><td>3%</td><td><span class="pill pill-r">URGENT ACTION</span></td></tr>
+      <tr><td style="color:#6b7280">Lost</td><td>1,205</td><td>15%</td><td>₹539</td><td>1%</td><td><span class="pill pill-g">RE-ACTIVATE</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Cohort Retention -->
+<div class="sec">
+  <h2>📊 24×13 Cohort Retention Matrix (Jan 2022 – Dec 2023)</h2>
+  <p style="font-size:0.78rem;color:#94a3b8;margin-bottom:10px">Green = High Retention · Red = Churned | CLV = AOV × Annual Transactions × 42% GM × Expected Lifetime</p>
+  <div class="hm">
+  <table>
+    <thead><tr><th>Cohort</th><th>M0</th><th>M1</th><th>M2</th><th>M3</th><th>M4</th><th>M5</th><th>M6</th><th>M7</th><th>M8</th><th>M9</th><th>M10</th><th>M11</th><th>M12</th></tr></thead>
+    <tbody>
+      <tr><td>Jan-22</td><td class="h-high">100%</td><td class="h-high">68%</td><td class="h-high">52%</td><td class="h-med">41%</td><td class="h-med">35%</td><td class="h-low">28%</td><td class="h-low">22%</td><td class="h-low">18%</td><td class="h-low">15%</td><td class="h-zero">12%</td><td class="h-zero">9%</td><td class="h-zero">7%</td><td class="h-zero">5%</td></tr>
+      <tr><td>Apr-22</td><td class="h-high">100%</td><td class="h-high">74%</td><td class="h-high">58%</td><td class="h-high">46%</td><td class="h-med">39%</td><td class="h-med">32%</td><td class="h-low">26%</td><td class="h-low">21%</td><td class="h-low">17%</td><td class="h-low">14%</td><td class="h-low">11%</td><td class="h-zero">9%</td><td class="h-zero">7%</td></tr>
+      <tr><td>Aug-22</td><td class="h-high">100%</td><td class="h-high">76%</td><td class="h-high">59%</td><td class="h-high">47%</td><td class="h-med">40%</td><td class="h-med">33%</td><td class="h-low">27%</td><td class="h-low">22%</td><td class="h-low">18%</td><td class="h-low">14%</td><td class="h-low">11%</td><td class="h-zero">9%</td><td class="h-zero">7%</td></tr>
+      <tr><td>Nov-22</td><td class="h-high">100%</td><td class="h-high">79%</td><td class="h-high">62%</td><td class="h-high">50%</td><td class="h-med">42%</td><td class="h-med">35%</td><td class="h-low">28%</td><td class="h-low">23%</td><td class="h-low">19%</td><td class="h-zero">15%</td><td class="h-zero">12%</td><td class="h-zero">9%</td><td class="h-zero">7%</td></tr>
+      <tr><td>Feb-23</td><td class="h-high">100%</td><td class="h-high">71%</td><td class="h-high">55%</td><td class="h-med">43%</td><td class="h-med">37%</td><td class="h-low">29%</td><td class="h-low">24%</td><td class="h-low">19%</td><td class="h-low">16%</td><td class="h-zero">13%</td><td class="h-zero">10%</td><td class="h-zero">8%</td><td class="h-zero">6%</td></tr>
+      <tr><td>Jun-23</td><td class="h-high">100%</td><td class="h-high">72%</td><td class="h-high">56%</td><td class="h-med">44%</td><td class="h-med">37%</td><td class="h-low">30%</td><td class="h-low">24%</td><td class="h-low">20%</td><td class="h-low">16%</td><td class="h-zero">13%</td><td class="h-zero">10%</td><td class="h-zero">8%</td><td class="h-zero">—</td></tr>
+      <tr><td>Oct-23</td><td class="h-high">100%</td><td class="h-high">73%</td><td class="h-high">57%</td><td class="h-med">45%</td><td class="h-med">38%</td><td class="h-low">31%</td><td class="h-low">25%</td><td class="h-low">20%</td><td class="h-zero">—</td><td class="h-zero">—</td><td class="h-zero">—</td><td class="h-zero">—</td><td class="h-zero">—</td></tr>
+      <tr><td>Dec-23</td><td class="h-high">100%</td><td class="h-high">82%</td><td class="h-high">64%</td><td class="h-high">51%</td><td class="h-med">43%</td><td class="h-zero">—</td><td class="h-zero">—</td><td class="h-zero">—</td><td class="h-zero">—</td><td class="h-zero">—</td><td class="h-zero">—</td><td class="h-zero">—</td><td class="h-zero">—</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="legend">
+    <span><span class="leg-dot" style="background:#064e3b"></span>High >40%</span>
+    <span><span class="leg-dot" style="background:#065f46"></span>Medium 25–40%</span>
+    <span><span class="leg-dot" style="background:#7f1d1d"></span>Low <25%</span>
+    <span><span class="leg-dot" style="background:#1f2937"></span>Very Low <15%</span>
+  </div>
+</div>
+
+<!-- Revenue Leakage -->
+<div class="sec">
+  <h2>💸 Revenue Leakage Summary</h2>
+  <table>
+    <thead><tr><th>Leakage Source</th><th>Customers</th><th>Revenue Impact</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td>Critical Churn Risk</td><td style="color:#f87171">3,261</td><td style="color:#f87171">₹2.86Cr at risk</td><td>Immediate retention campaigns</td></tr>
+      <tr><td>Discount Abuse (>60% orders at 30%+ disc)</td><td style="color:#fbbf24">663</td><td style="color:#fbbf24">₹48.1L margin/yr</td><td>Cap discount eligibility</td></tr>
+      <tr><td>Cannot Lose Them — Declining</td><td style="color:#fb923c">799</td><td style="color:#fb923c">₹31,000 CLV each</td><td>VIP re-engagement</td></tr>
+      <tr><td>Best Acquisition: Referral (CLV/CAC = 123×)</td><td>—</td><td style="color:#34d399">vs Influencer 3.6×</td><td>Scale referral program</td></tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+<footer>
+  Built by <strong>Anke Jimrison</strong> — Data Analyst · Hyderabad, India<br><br>
+  <a href="https://github.com/anke-jimrison/Customer-360-Revenue-Leakage">📁 Repository</a>
+  <a href="https://linkedin.com/in/anke-jimrison">💼 LinkedIn</a>
+  <a href="mailto:jimrisonanke@gmail.com">📧 Email</a>
+</footer>
+
+<script>
+const pu = (id, type, labels, data, colors, opts={}) => {
+  new Chart(document.getElementById(id), {
+    type, data: {labels, datasets:[{data, backgroundColor:colors, borderColor: type==='bar'?colors:undefined, borderWidth: type==='bar'?1:2}]},
+    options: {responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}}, ...opts}
+  });
+};
+
+// Segment donut
+pu('segChart','doughnut',
+  ['Champions','Loyal','Pot.Loyalists','New','Promising','At Risk','Cannot Lose','Lost'],
+  [1433,1118,959,719,639,1118,799,1205],
+  ['#fbbf24','#34d399','#60a5fa','#38bdf8','#818cf8','#fb923c','#f87171','#6b7280']
+);
+
+// GMV bar
+new Chart(document.getElementById('gmvChart'),{
+  type:'bar',
+  data:{labels:['Champions','Loyal','Pot.Loyalists','New','Promising','At Risk','Cannot Lose','Lost'],
+    datasets:[{label:'GMV %',data:[54,21,9,4,3,5,3,1],
+      backgroundColor:['#fbbf24','#34d399','#60a5fa','#38bdf8','#818cf8','#fb923c','#f87171','#6b7280']}]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'#94a3b8'}}},
+    scales:{x:{ticks:{color:'#94a3b8',font:{size:9}}},y:{ticks:{color:'#94a3b8'},grid:{color:'#1e293b'}}}}
+});
+
+// CLV bar
+new Chart(document.getElementById('clvChart'),{
+  type:'bar',
+  data:{labels:['Champions','Cannot Lose','Loyal','At Risk','Promising','New','Lost'],
+    datasets:[{label:'CLV (₹)',data:[56472,31000,28340,9200,6100,4800,539],
+      backgroundColor:['#fbbf24','#f87171','#34d399','#fb923c','#818cf8','#60a5fa','#6b7280']}]},
+  options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',
+    plugins:{legend:{labels:{color:'#94a3b8'}}},
+    scales:{x:{ticks:{color:'#94a3b8'},grid:{color:'#1e293b'}},y:{ticks:{color:'#94a3b8',font:{size:9}}}}}
+});
+
+// Churn donut
+pu('churnChart','doughnut',
+  ['Critical (>70)','High (50-70)','Medium (30-50)','Low (<30)'],
+  [3261,1847,2104,778],
+  ['#f87171','#fb923c','#fbbf24','#34d399']
+);
+</script>
+</body>
+</html>
