@@ -4,7 +4,8 @@
 
 ![Dashboard Preview](https://img.shields.io/badge/🔴_LIVE_DASHBOARD-Click_to_View-green?style=for-the-badge)
 
-**[▶ VIEW LIVE INTERACTIVE DASHBOARD](https://anke-jimrison.github.io/customer-360-analytics/dashboard.html)**
+**[▶ VIEW LIVE INTERACTIVE DASHBOARD]( https://anke-jimrison.github.io/Customer-360-Revenue-Leakage/
+)**
 
 ![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white)
